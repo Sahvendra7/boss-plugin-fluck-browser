@@ -5264,22 +5264,38 @@ internal fun buildContextMenuItems(
         // Edit operations for text fields (first, like main branch)
         add(ContextMenuItem(
             text = "Cut",
-            onClick = { browserHandle.onBrowser("cut") { it.cut() } }
+
+            onClick = { browserHandle.onBrowser("cut") { it.cut(info.menuContext) } }
+
+
+
         ))
 
         add(ContextMenuItem(
             text = "Copy",
-            onClick = { browserHandle.onBrowser("copySelection") { it.copySelection() } }
+
+            onClick = { browserHandle.onBrowser("copySelection") { it.copySelection(info.menuContext) } }
+
+
+
         ))
 
         add(ContextMenuItem(
             text = "Paste",
-            onClick = { browserHandle.onBrowser("paste") { it.paste() } }
+
+            onClick = { browserHandle.onBrowser("paste") { it.paste(info.menuContext) } }
+
+
+
         ))
 
         add(ContextMenuItem(
             text = "Select All",
-            onClick = { browserHandle.onBrowser("selectAll") { it.selectAll() } }
+
+            onClick = { browserHandle.onBrowser("selectAll") { it.selectAll(info.menuContext) } }
+
+
+
         ))
 
         add(ContextMenuItem(isDivider = true))
@@ -6597,9 +6613,9 @@ internal fun FluckBrowserStubContent() {
     }
 }
 
-// ============================================================
+// =====================================================
 // SECRET DIALOGS
-// ============================================================
+// =====================================================
 
 private val BossDarkBackground get() = BossThemeColors.BackgroundColor
 private val BossDarkBorder get() = BossThemeColors.BorderColor
@@ -7234,9 +7250,9 @@ private fun QuickDialogTextField(
     }
 }
 
-// ============================================================
+// =====================================================
 // FULLSCREEN SUPPORT
-// ============================================================
+// =====================================================
 
 /**
  * Placeholder shown in the tab when browser content is displayed in fullscreen mode.
