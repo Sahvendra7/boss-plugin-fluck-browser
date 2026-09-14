@@ -2316,7 +2316,9 @@ internal class FluckBrowserTabState {
     // Composable from composition; the callback lambda captured the *old* instance and
     // would keep writing to it, leaving the UI observing a state nobody updates. That is
     // exactly how right-click went dead after the first tab switch.
-    var contextMenuInfo: BrowserContextMenuInfo? by mutableStateOf(null)
+    // Menu contents can compare equal while their transient frame tokens differ.
+    // Retain each new callback object so a later menu never reuses the earlier frame.
+    var contextMenuInfo: BrowserContextMenuInfo? by mutableStateOf(null, referentialEqualityPolicy())
     // Bumped once per right-click. A counter rather than a boolean so two right-clicks in
     // a row are two distinct values: keying the show-effect on a boolean silently drops
     // the second request whenever the first menu's dismissal hasn't reset it yet.

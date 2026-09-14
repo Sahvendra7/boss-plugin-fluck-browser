@@ -5,6 +5,7 @@ import ai.rever.boss.plugin.browser.BrowserHandle
 import ai.rever.boss.plugin.browser.BrowserMenuContext
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertSame
 import java.lang.reflect.Proxy
 
 class ContextMenuActionsTest {
@@ -135,4 +136,36 @@ class ContextMenuActionsTest {
         items2.first { it.text == "Paste" }.onClick()
         assertEquals(context2, recording.lastContext)
     }
+    @Test
+    fun `equal menu contents retain the newest frame token in tab state`() {
+        val state = FluckBrowserTabState()
+        val firstContext = DummyMenuContext()
+        val latestContext = DummyMenuContext()
+        val first = BrowserContextMenuInfo(isEditable = true, menuContext = firstContext)
+        val latest = BrowserContextMenuInfo(isEditable = true, menuContext = latestContext)
+        // The API excludes the transient frame token from data-class equality.
+        assertEquals(first, latest)
+        state.contextMenuInfo = first
+        state.contextMenuInfo = latest
+        assertSame(latest, state.contextMenuInfo)
+
+        val recording = Recording()
+        val items = callBuilder(state.contextMenuInfo!!, createRecordingHandle(recording))
+        items.first { it.text == "Paste" }.onClick()
+        assertEquals("paste", recording.lastCommand)
+        assertSame(latestContext, recording.lastContext)
+    }
+
+    @Test
+    fun `editor commands forward a missing context for legacy frame resolution`() {
+        for ((label, command) in listOf("Cut" to "cut", "Copy" to "copySelection",
+            "Paste" to "paste", "Select All" to "selectAll")) {
+            val recording = Recording().apply { lastContext = DummyMenuContext() }
+            val items = callBuilder(BrowserContextMenuInfo(isEditable = true), createRecordingHandle(recording))
+            items.first { it.text == label }.onClick()
+            assertEquals(command, recording.lastCommand)
+            assertEquals(null, recording.lastContext)
+        }
+    }
+
 }
